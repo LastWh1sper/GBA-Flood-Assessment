@@ -1,0 +1,8 @@
+{
+    "startTime":"2021-08-20",
+    "interval":2000,
+    "projects":["guangzhou"],
+    "LandUseData":"LandUse.tif",
+    "humanData":"human.tif",
+    "GDPData":"GDP.tif"
+}
