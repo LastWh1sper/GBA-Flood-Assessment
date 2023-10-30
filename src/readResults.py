@@ -25,6 +25,12 @@ def readAllDepth(city,path,landuse,dt):
     bdtotal = np.count_nonzero(landdata == 6) * landuse.res[0]**2
     croptotal = np.count_nonzero(landdata == 5) * landuse.res[0]**2
     allarea = np.count_nonzero((landdata > 0 ) & (landdata < 13)) * landuse.res[0]**2
+
+    print("Total Area: {} km^2".format(allarea/1000/1000))
+    print("Building Area: {} km^2".format(bdtotal/1000/1000))
+    print("Traffic Area: {} km^2".format(traffictotal/1000/1000))
+    print("Crop Area: {} km^2".format(croptotal/1000/1000))
+       
     colname =['时间', '轻度积水面积', '中度积水面积', '重度积水面积', '轻度积水比例', '中度积水比例', '重度积水比例',
                '体积', '作物受损面积', '作物受损比例', '建筑受损面积', '建筑受损比例', '交通受损面积', '交通受损比例', '影响人口']
     df = pd.DataFrame(columns= colname)
