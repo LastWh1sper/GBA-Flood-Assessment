@@ -21,15 +21,26 @@ def readAllDepth(city,path,landuse,dt):
     poptrans = pop.transform
     landusetrans = landuse.transform
 
-    traffictotal = np.count_nonzero(landdata == 1) * landuse.res[0]**2
-    bdtotal = np.count_nonzero(landdata == 6) * landuse.res[0]**2
-    croptotal = np.count_nonzero(landdata == 5) * landuse.res[0]**2
-    allarea = np.count_nonzero((landdata > 0 ) & (landdata < 13)) * landuse.res[0]**2
+    # traffictotal = np.count_nonzero(landdata == 1) * landuse.res[0]**2
+    # bdtotal = np.count_nonzero(landdata == 6) * landuse.res[0]**2
+    # croptotal = np.count_nonzero(landdata == 5) * landuse.res[0]**2
+    # allarea = np.count_nonzero((landdata > 0 ) & (landdata < 13)) * landuse.res[0]**2
 
-    print("Total Area: {} km^2".format(allarea/1000/1000))
-    print("Building Area: {} km^2".format(bdtotal/1000/1000))
+    condition = lambda x: x == 1
+    traffictotal = count_elements(landdata, condition) * landuse.res[0]**2
     print("Traffic Area: {} km^2".format(traffictotal/1000/1000))
+    condition = lambda x: x == 6
+    bdtotal = count_elements(landdata, condition) * landuse.res[0]**2
+    print("Building Area: {} km^2".format(bdtotal/1000/1000))
+    condition = lambda x: x == 5
+    croptotal = count_elements(landdata, condition) * landuse.res[0]**2
     print("Crop Area: {} km^2".format(croptotal/1000/1000))
+    condition = lambda x: (x > 0 ) & (x < 13)
+    allarea = count_elements(landdata, condition) * landuse.res[0]**2
+    print("Total Area: {} km^2".format(allarea/1000/1000))
+    
+
+    
        
     colname =['时间', '轻度积水面积', '中度积水面积', '重度积水面积', '轻度积水比例', '中度积水比例', '重度积水比例',
                '体积', '作物受损面积', '作物受损比例', '建筑受损面积', '建筑受损比例', '交通受损面积', '交通受损比例', '影响人口']
@@ -84,7 +95,7 @@ def readAllDepth(city,path,landuse,dt):
                                         trafficA += area
                                     elif(landtype) == 5:
                                         cropA += area
-                                    elif(landtype) == 6:
+                                    elif(landtype) == 6: 
                                         bdA += area
                                     affectedPeople += popdensity / 10000 * area
                                 else:
@@ -98,8 +109,9 @@ def readAllDepth(city,path,landuse,dt):
                                     affectedPeople += popdensity / 10000 * area
                             #count landusetype 
                 # Preapare data
-                output1 = [ttime,qingA,zA,zhongA, qingA/allarea, zA/allarea, zhongA/allarea, volume, cropA, cropA / croptotal, bdA, bdA/bdtotal, trafficA, trafficA/traffictotal,affectedPeople]
+                output1 = [ttime,qingA,zA,zhongA, qingA/allarea, zA/allarea, zhongA/allarea, volume, cropA, cropA / croptotal, bdA, bdA/bdtotal, trafficA, trafficA/traffictotal, affectedPeople]
                 data1 = pd.Series(output1, index = df.columns)
+                print(data1)
                 df.loc[len(df)] = data1
             
     df.to_csv(city+'.csv')
@@ -109,3 +121,24 @@ def readRasterValue(x, y, src, trans):
     col, row = ~trans * (x, y)
     value = src.read(1, window=((row, row+1), (col, col+1)))
     return value[0][0]
+
+
+def count_elements1(array, condition):
+    count = 0
+    # 使用NumPy的迭代器遍历数组的所有元素
+    for element in np.nditer(array):
+        # 判断元素是否符合条件
+        if condition(element):
+            count += 1
+    return count
+
+def count_elements(array, condition):
+    # 将数组分为10份
+    sub_arrays = np.array_split(array, 40)
+    counts = []
+    # 统计每份数据中符合条件的数量
+    for ii, sub_array in enumerate(sub_arrays):
+        print("COUNT ITEM : {}".format(ii))
+        counts.append(np.count_nonzero(condition(sub_array)))
+    count = sum(counts)
+    return count
