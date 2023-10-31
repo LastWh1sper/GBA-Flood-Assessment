@@ -7,7 +7,7 @@ def readAllDepth(city,path,landuse,dt):
     print("Reading data~")
     filelist = os.listdir(path)
     wdfiles = [adata for adata in filelist if adata.endswith('.wd')]
-    wdfiles.sort()
+    wdfiles.sort(reverse=True)
     
     currentpath = os.getcwd()
     # Read Pop data
@@ -74,6 +74,7 @@ def readAllDepth(city,path,landuse,dt):
                 # Get the number of rows and columns in the raster
                 rows, cols = ddata.shape
                 # Loop through each cell in the raster
+                #@par(schedule='dynamic', chunk_size=100, num_threads=4)
                 for row in range(rows):
                     for col in range(cols):
                         # Get the value of the cell
